@@ -1,4 +1,4 @@
-# Generate docker-compose.yml for all Unraid Docker containers
+# Generate docker-compose.yml from Unraid docker container
 
 ## Experimental
 
@@ -17,10 +17,15 @@ into the source code, such as SSH key exchange policies.
 ## Installation
 
 1. Enable SSH access on Unraid:
+
     a. Unraid WebUI
+
     b. Settings
+
     c. Management Access
+
     d. User root: Manage
+
     e. On your local computer, copy the contents of all of the following
        files and append it to the "SSH authorized keys" text field on the
        Unraid Web UI, one per line:
@@ -32,14 +37,14 @@ into the source code, such as SSH key exchange policies.
        If you have neither, generate a new one with ssh-keygen.
 
 2. Install **go** and dependencies, e.g. on macOS:
-          ```
-          brew install golang
-          pip3 install runlike
-          brew install npm
-          npm install -g composerize
-          ```
 
-          Ensure the runlike command is available in the path.
+      ```
+      brew install golang npm
+      npm install -g composerize
+      pip3 install runlike
+      ```
+
+   Ensure the runlike command is available in the path.
 
 3. Ensure the Unraid host is present in the ~/.ssh/known\_hosts file.
    If not, open a new session `ssh <user>@<host>`, and reply `y` when asked
@@ -53,4 +58,12 @@ into the source code, such as SSH key exchange policies.
 go run main.go -- --help
 ```
 
+## How to help
 
+If you want to help, there's lots to improve:
+
+  - Support for other types of private keys
+  - Go modules instead of single file
+  - Installation instructions for other systems
+  - CI pipeline to create a distributable compiled version
+  - Create a Homebrew tap
