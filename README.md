@@ -67,3 +67,4 @@ If you want to help, there's lots to improve:
   - Installation instructions for other systems
   - CI pipeline to create a distributable compiled version
   - Create a Homebrew tap
+  - Pre-commit hook, including "go fmt".
