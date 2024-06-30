@@ -78,7 +78,9 @@ func ListByName(host *SshHost) {
 		names = append(names, name)
 	}
 
-	sort.Strings(names)
+	sort.Slice(names, func(i, j int) bool {
+		return strings.ToLower(names[i]) < strings.ToLower(names[j])
+	})
 
 	for _, name := range names {
 		fmt.Println(name)
@@ -230,8 +232,8 @@ func lines(in string) []string {
 func ParseFlags(host *SshHost) {
 	// Flag options
 
+	// --list           Lists containers by name
 	// --ids            Lists containers by ID
-	// --names, --list  Lists containers by name
 	//
 	// --id <ID>        Outputs docker-compose.yml contents to stdout,
 	//                  for container with short identifier <ID>
@@ -243,7 +245,7 @@ func ParseFlags(host *SshHost) {
 	var id string
 	var name string
 
-	flag.BoolVar(&list_by_name, "names", false, "List containers by name")
+	flag.BoolVar(&list_by_name, "list", false, "List containers by name")
 	flag.BoolVar(&list_by_id, "ids", false, "List containers by id")
 	flag.StringVar(&id, "id", "", "Output docker-compose.yml contents to stdout for container with id <ID>")
 	flag.StringVar(&name, "name", "", "Output docker-compose.yml contents to stdout for container with name <NAME>")
