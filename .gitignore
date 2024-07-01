@@ -24,3 +24,6 @@ go.work.sum
 # ViM
 .*.swp
 *~
+
+/composerize-unraid
+/output/
