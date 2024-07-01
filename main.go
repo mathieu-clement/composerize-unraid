@@ -229,7 +229,7 @@ func lines(in string) []string {
 	return strings.Split(strings.TrimSuffix(in, "\n"), "\n")
 }
 
-func ParseFlags(host *SshHost) {
+func ParseFlags() {
 	// Flag options
 
 	// --list           Lists containers by name
@@ -239,16 +239,19 @@ func ParseFlags(host *SshHost) {
 	//                  for container with short identifier <ID>
 	// --name <NAME>    Outputs docker-compose.yml contents to stdout,
 	//                  for container with name <NAME>
+	// --host <HOST>    Unraid hostname or IP address
 
 	var list_by_name bool
 	var list_by_id bool
 	var id string
 	var name string
+	var hostname string
 
 	flag.BoolVar(&list_by_name, "list", false, "List containers by name")
 	flag.BoolVar(&list_by_id, "ids", false, "List containers by id")
 	flag.StringVar(&id, "id", "", "Output docker-compose.yml contents to stdout for container with id <ID>")
 	flag.StringVar(&name, "name", "", "Output docker-compose.yml contents to stdout for container with name <NAME>")
+	flag.StringVar(&hostname, "host", os.Getenv("HOST"), "Unraid hostname or IP address. Overrides HOST environment variable.")
 
 	flag.Usage = PrintUsage
 
@@ -264,37 +267,14 @@ func ParseFlags(host *SshHost) {
 		log.Fatal("Use only one of: --id, --name")
 	}
 
-	switch {
-	case list_by_name:
-		ListByName(host)
-	case list_by_id:
-		ListById(host)
-	case id != "":
-		ComposerizeByIdOrName(host, id)
-	case name != "":
-		ComposerizeByIdOrName(host, name)
-	default:
-		fmt.Println("No flags provided, printing usage:")
-		fmt.Println()
-		flag.Usage()
-	}
-}
-
-func PrintUsage() {
-	fmt.Fprintln(os.Stderr, "Usage: composerize-unraid [options]\n")
-	flag.PrintDefaults()
-}
-
-func main() {
-
+	// SSH host config
 	user := os.Getenv("USERNAME")
 	if user == "" {
 		user = "root"
 	}
 
-	host := os.Getenv("HOST")
-	if host == "" {
-		log.Fatal("HOST environment variable is required. Set to Unraid hostname or IP address.")
+	if hostname == "" {
+		log.Fatal("--host parameter or HOST environment variable is required.")
 	}
 
 	var port uint16 = 22
@@ -307,13 +287,45 @@ func main() {
 		port = uint16(envPortInt)
 	}
 
-	sshHost := SshHost{
+	host := SshHost{
 		User:           user,
-		Host:           host,
+		Host:           hostname,
 		Port:           port,
 		PrivateKeyPath: os.Getenv("HOME") + "/.ssh/id_ed25519",
 		KnownHostsPath: os.Getenv("HOME") + "/.ssh/known_hosts",
 	}
 
-	ParseFlags(&sshHost)
+	switch {
+	case list_by_name:
+		ListByName(&host)
+	case list_by_id:
+		ListById(&host)
+	case id != "":
+		ComposerizeByIdOrName(&host, id)
+	case name != "":
+		ComposerizeByIdOrName(&host, name)
+	default:
+		flag.Usage()
+		fmt.Println()
+		fmt.Println("No flags provided (typically --list or --id <CONTAINER_ID>).")
+		os.Exit(1)
+	}
+}
+
+func PrintUsage() {
+	fmt.Fprintln(os.Stderr, "USAGE")
+	fmt.Fprintln(os.Stderr, "  composerize-unraid [options]")
+	fmt.Fprintln(os.Stderr, "")
+	fmt.Fprintln(os.Stderr, "OPTIONS")
+	flag.PrintDefaults()
+	fmt.Fprintln(os.Stderr, "")
+	fmt.Fprintln(os.Stderr, "ENVIRONMENT VARIABLES")
+	fmt.Fprintln(os.Stderr, "To configure the SSH connection to the Unraid instance:")
+	fmt.Fprintln(os.Stderr, "  - HOST (overridden by --host parameter)")
+	fmt.Fprintln(os.Stderr, "  - PORT (defaults to 22 if unset)")
+	fmt.Fprintln(os.Stderr, "  - USERNAME (defaults to 'root' if unset)")
+}
+
+func main() {
+	ParseFlags()
 }
