@@ -54,9 +54,44 @@ into the source code, such as SSH key exchange policies.
 
 ## Usage
 
+This will list the containers by name. We suppose Unraid is reachable at address 192.168.0.10
+and we want to copy the configuraiton of 3 containers named duplicati, syslog-ng and watchtower
+into a docker-compose.yml file in a folder bearing the name of the container inside of a new "output"
+directory.
+At the end, the tree command shows the created files.
+
 ```
-go run main.go -- --help
+go run . --host 192.168.0.10 --list
+mkdir output
+for container in duplicati syslog-ng watchtower; do
+  mkdir $container
+  go run . --host 192.168.0.10 --name $container > ${container}/docker-compose.yml
+done
+tree output/
 ```
+
+The YAML files should NOT be used as-is. They represent the exact configuration deployed on
+the Unraid instance, but they're likely not what you want on another machine.
+
+For example, the following parameters are set, which you probably want to change or remove altogether:
+
+  - hostname
+  - mac\_address
+  - environment.HOST_*
+  - network\_mode
+  - working\_dir
+  - logging
+  - runtime
+  - labels.`net.unraid.docker.manager`
+
+Some of these parameters are set to default values, e.g. `network_mode` and `runtime`, 
+so removing them will help readability.
+
+Likewise the volume mappings will probably need to be adjusted since the host file system is different.
+
+Finally you might want to group configurations together in a single docker-compose.yml for services
+run as a group (e.g. an application and its database) and fine-tune the network configuration, including
+removing ports needlessly exposed.
 
 ## How to help
 
@@ -68,3 +103,4 @@ If you want to help, there's lots to improve:
   - CI pipeline to create a distributable compiled version
   - Create a Homebrew tap
   - Pre-commit hook, including "go fmt".
+  - Add flag to automatically remove some of the configuration above
