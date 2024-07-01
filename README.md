@@ -42,11 +42,28 @@ into the source code, such as SSH key exchange policies.
 
       ```
       brew install golang npm
-      npm install -g composerize
+      npm install -g composerize # or install only in current directory without -g flag
       pip3 install runlike
       ```
 
-   Ensure the runlike command is available in the path.
+   or on Debian:
+
+      ```
+      sudo apt install golang npm pipx
+      sudo npm install -g composerize # or install only in current directory without -g flag and sudo
+
+      # Run as user that will execute composerize-unraid
+      pipx install runlike
+      pipx ensurepath # if needed, then re-login as prompted
+      ```
+
+
+   Ensure the runlike and composerize commands are available in the PATH:
+
+     ```
+     runlike --help
+     composerize --help
+     ```
 
 3. Ensure the Unraid host is present in the ~/.ssh/known\_hosts file.
    If not, open a new session `ssh <user>@<host>`, and reply `y` when asked
@@ -102,7 +119,6 @@ If you want to help, there's lots to improve:
   - Fix bug of aggressive quoting / shell escaping resulting in invalid compose files
   - Support for other types of private keys
   - Go modules instead of single file
-  - Installation instructions for other systems
   - CI pipeline to create a distributable compiled version
   - Create a Homebrew tap
   - Pre-commit hook, including "go fmt".
