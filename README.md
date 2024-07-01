@@ -11,6 +11,8 @@ While efforts have been made to quote / escape variables when invoked
 as shell arguments, there is no guarantee that malicious container metadata
 might not cause denial of service or remote code execution.
 
+Some of this escaping logic as it is pretty agressive results in invalid docker-compose.yml.
+
 It is also not very flexible at this moment, with some details hardcoded
 into the source code, such as SSH key exchange policies.
 
@@ -97,6 +99,7 @@ removing ports needlessly exposed.
 
 If you want to help, there's lots to improve:
 
+  - Fix bug of aggressive quoting / shell escaping resulting in invalid compose files
   - Support for other types of private keys
   - Go modules instead of single file
   - Installation instructions for other systems
