@@ -205,15 +205,19 @@ func runlike(container DockerContainer) string {
 // Caller sanitizes input
 // returns stdout as stirng
 func composerize(dockerRunCommand string) string {
-	cmd := exec.Command("composerize", strings.Split(dockerRunCommand, " ")...)
+	var sb strings.Builder
+    sb.WriteString("# ")
+    sb.WriteString(dockerRunCommand)
+    sb.WriteString("\n\n")
+	
+    cmd := exec.Command("composerize", strings.Split(dockerRunCommand, " ")...)
 
 	out, err := cmd.Output()
 	if err != nil {
 		log.Fatalf("Error composerizing: %v", err)
 	}
-
-	lines := lines(string(out))
-	var sb strings.Builder
+	
+    lines := lines(string(out))
 
 	for _, line := range lines {
 		if !strings.Contains(line, "<your project name>") {
