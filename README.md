@@ -50,7 +50,7 @@ into the source code, such as SSH key exchange policies.
    If not, open a new session `ssh <user>@<host>`, and reply `y` when asked
    about authenticity.
 
-4. `go run main.go -- -name <NAME>`
+4. `go build && ./composerize-unraid --name <NAME>`
 
 ## Usage
 
@@ -61,11 +61,11 @@ directory.
 At the end, the tree command shows the created files.
 
 ```
-go run . --host 192.168.0.10 --list
+./composerize-unraid --host 192.168.0.10 --list
 mkdir output
 for container in duplicati syslog-ng watchtower; do
   mkdir $container
-  go run . --host 192.168.0.10 --name $container > ${container}/docker-compose.yml
+  ./composerize-unraid --host 192.168.0.10 --name $container > ${container}/docker-compose.yml
 done
 tree output/
 ```
